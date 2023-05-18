@@ -20,7 +20,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.apache.flink.util.Collector;
 import org.example.flink.config.BaseConfig;
-import org.example.flink.storage.RedisAdCampaignCache;
+import org.example.flink.workload.yahoo.storage.RedisAdCampaignCache;
 import org.example.flink.config.YahooConfig;
 import org.example.flink.workload.BaseWorkload;
 import org.slf4j.Logger;

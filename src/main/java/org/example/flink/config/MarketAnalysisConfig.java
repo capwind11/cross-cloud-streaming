@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
  */
 public class MarketAnalysisConfig extends BaseConfig {
 
-
     /**
      * Creates a config given a Yaml file
      */

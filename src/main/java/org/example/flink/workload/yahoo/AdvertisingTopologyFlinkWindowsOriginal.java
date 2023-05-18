@@ -22,7 +22,7 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.apache.flink.util.Collector;
-import org.example.flink.storage.RedisAdCampaignCache;
+import org.example.flink.workload.yahoo.storage.RedisAdCampaignCache;
 import org.example.flink.config.YahooConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

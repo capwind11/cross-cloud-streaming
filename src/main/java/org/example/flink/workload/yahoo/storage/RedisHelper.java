@@ -1,4 +1,4 @@
-package org.example.flink.storage;
+package org.example.flink.workload.yahoo.storage;
 
 import org.example.flink.config.YahooConfig;
 import org.slf4j.Logger;

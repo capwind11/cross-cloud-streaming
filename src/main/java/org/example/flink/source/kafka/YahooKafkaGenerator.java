@@ -5,7 +5,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.example.flink.source.YahooGenerator;
-import org.example.flink.storage.RedisHelper;
+import org.example.flink.workload.yahoo.storage.RedisHelper;
 import org.example.flink.config.YahooConfig;
 
 import java.util.List;
@@ -51,6 +51,4 @@ public class YahooKafkaGenerator {
 
 		env.execute("Ad Impressions data generator " + yahooConfig.getParameters().toMap().toString());
 	}
-
-
 }

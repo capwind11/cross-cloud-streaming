@@ -6,7 +6,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.example.flink.config.YahooConfig;
 import org.example.flink.source.YahooGenerator;
-import org.example.flink.storage.RedisHelper;
+import org.example.flink.workload.yahoo.storage.RedisHelper;
 import org.example.flink.workload.yahoo.AdvertisingTopologyFlinkWindows;
 
 import java.io.FileNotFoundException;
