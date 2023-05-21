@@ -31,12 +31,12 @@ import java.util.Iterator;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class AdvertisingTopologyFlinkWindows implements BaseWorkload {
+public class AdvertisingTopologyFlinkWindows extends BaseWorkload {
 
     private static final Logger LOG = LoggerFactory.getLogger(AdvertisingTopologyFlinkWindows.class);
 
     @Override
-    public void createJob(BaseConfig baseConfig, DataStream<String> source) throws Exception {
+    public void createWorkload(BaseConfig baseConfig, DataStream<String> source) throws Exception {
 
         YahooConfig config = (YahooConfig) baseConfig;
         DataStream<Tuple2<String, String>> joinedAdImpressions = source

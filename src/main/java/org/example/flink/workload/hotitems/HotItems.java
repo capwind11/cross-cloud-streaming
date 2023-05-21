@@ -31,9 +31,9 @@ import java.util.Comparator;
  * @Author: 土哥 on 2020/11/14 15:16
  * @Version: 1.0
  */
-public class HotItems implements BaseWorkload{
+public class HotItems extends BaseWorkload{
     @Override
-    public void createJob(BaseConfig config, DataStream<String> source) throws Exception {
+    public void createWorkload(BaseConfig config, DataStream<String> source) throws Exception {
         DataStream<Tuple5<Long, Long, Integer, String, Long>> dataStream = source
                 .map(
                         new MapFunction<String, Tuple5<Long, Long, Integer, String, Long>>() {

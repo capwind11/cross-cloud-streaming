@@ -22,10 +22,10 @@ import org.example.flink.workload.market_analysis.beans.BlackListUserWarning;
 
 import java.sql.Timestamp;
 
-public class AdStatisticsByProvince implements BaseWorkload {
+public class AdStatisticsByProvince extends BaseWorkload {
 
     @Override
-    public void createJob(BaseConfig config, DataStream<String> source) throws Exception {
+    public void createWorkload(BaseConfig config, DataStream<String> source) throws Exception {
 
         // 1. 从文件中读取数据
         DataStream<AdClickEvent> adClickEventStream = source.map( line -> {
