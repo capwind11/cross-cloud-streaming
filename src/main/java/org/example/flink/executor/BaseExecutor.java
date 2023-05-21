@@ -50,5 +50,5 @@ public abstract class BaseExecutor {
 
     abstract void init(String[] args) throws FileNotFoundException;
 
-    abstract void prepareSource();
+    abstract void prepareSource() throws Exception;
 }

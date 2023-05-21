@@ -1,13 +1,13 @@
 package org.example.flink.executor;
 
-import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.streaming.api.TimeCharacteristic;
+import org.apache.flink.streaming.api.functions.source.RichParallelSourceFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
+import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.example.flink.config.MarketAnalysisConfig;
+import org.example.flink.source.MarketAnalysisGenerator;
 import org.example.flink.workload.market_analysis.AdStatisticsByProvince;
 
 import java.io.FileNotFoundException;
-import java.util.Properties;
 
 public class MarketAnalysisExecutor extends BaseExecutor {
     @Override
@@ -19,29 +19,22 @@ public class MarketAnalysisExecutor extends BaseExecutor {
     }
 
     @Override
-    void prepareSource() {
+    void prepareSource() throws Exception {
+        // Choose a source -- Either local generator or Kafka
+        RichParallelSourceFunction<String> sourceGenerator;
+        String sourceName;
+        if (config.useLocalEventGenerator) {
+            MarketAnalysisGenerator eventGenerator = new MarketAnalysisGenerator((MarketAnalysisConfig) config);
+            sourceGenerator = eventGenerator;
+            sourceName = "EventGenerator";
+        } else {
+            sourceGenerator = new FlinkKafkaConsumer<>(
+                    config.kafkaTopic,
+                    new SimpleStringSchema(),
+                    config.getParameters().getProperties());;
+            sourceName = "Kafka";
+        }
 
-        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-        env.enableCheckpointing(5000);
-        env.setParallelism(4);
-
-        //Todo 2.准备kafka连接参数
-        Properties prop = new Properties();
-        prop.setProperty("bootstrap.servers", "127.0.0.1:9092");
-        prop.setProperty("group.id", "consumer-group");
-        prop.setProperty("auto.offset.reset", "earliest");
-        String topic = "adClickLog";
-
-        //Todo 3.创建kafka数据源
-        FlinkKafkaConsumer<String> flinkKafkaConsumer = (FlinkKafkaConsumer<String>)
-                new FlinkKafkaConsumer<String>(topic,new SimpleStringSchema(),prop);
-        flinkKafkaConsumer.setStartFromEarliest();
-        //Todo 4.指定消费者参数
-        flinkKafkaConsumer.setCommitOffsetsOnCheckpoints(true);//默认为true
-        //Todo 从最早的数据开始消费
-        flinkKafkaConsumer.setStartFromEarliest();
-
-//        DataStream<String> inputStream = env.readTextFile("/Users/zhangyang/experiment/benchmark/flink_second_understand/FlinkStudy/src/main/java/com/threeknowbigdata/flink/market_analysis/data/AdClickLog.csv");
-        source = env.addSource(flinkKafkaConsumer);
+        source = env.addSource(sourceGenerator, sourceName).disableChaining();
     }
 }

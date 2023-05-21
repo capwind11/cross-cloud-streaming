@@ -4,7 +4,7 @@
 kafka.brokers:
   - "127.0.0.1"
 kafka.port: 9092
-kafka.topic: "yahoo-source"
+kafka.topic: "ma-source"
 kafka.partitions: 2
 kafka.zookeeper.path: /
 
@@ -54,9 +54,9 @@ parallelism: 1
 
 
 # The following is for when running the EventGenerator directly rather than reading from Kafka
-use.local.event.generator: 1
+#use.local.event.generator: 1
 redis.flush: 1
 redis.db: 0
 load.target.hz: 10000
-num.campaigns: 1000000
-num.ads.per.campaigns: 1000000
+num.users: 100000
+num.ads: 10000000

@@ -7,11 +7,17 @@ import java.io.FileNotFoundException;
  */
 public class MarketAnalysisConfig extends BaseConfig {
 
+    public int numUsers;
+
+    public int numAds;
+
     /**
      * Creates a config given a Yaml file
      */
     public MarketAnalysisConfig(String yamlFile) throws FileNotFoundException {
         super(yamlToParameters(yamlFile));
+        this.numUsers = parameters.getInt("num.users", 10000);
+        this.numAds = parameters.getInt("num.ads", 1000000);
     }
 
     /**
