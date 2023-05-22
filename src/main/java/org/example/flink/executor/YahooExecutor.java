@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.apache.flink.streaming.api.functions.source.RichParallelSourceFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
+import org.example.flink.common.MyDataStream;
 import org.example.flink.config.YahooConfig;
 import org.example.flink.source.YahooGenerator;
 import org.example.flink.workload.yahoo.storage.RedisHelper;
@@ -47,6 +48,7 @@ public class YahooExecutor extends BaseExecutor {
             sourceName = "Kafka";
         }
 
-        source = env.addSource(sourceGenerator, sourceName).disableChaining();
+        source = new MyDataStream(env.addSource(sourceGenerator, sourceName).disableChaining());
+        source = new MyDataStream(env.addSource(sourceGenerator, sourceName).disableChaining());
     }
 }

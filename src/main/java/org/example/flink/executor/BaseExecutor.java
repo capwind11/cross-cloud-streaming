@@ -21,7 +21,7 @@ public abstract class BaseExecutor {
 
     public StreamExecutionEnvironment env;
 
-    public MyDataStream<String> source;
+    public MyDataStream source;
 
     public BaseConfig config;
 

@@ -14,6 +14,7 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
+import org.example.flink.common.MyDataStream;
 import org.example.flink.config.BaseConfig;
 import org.example.flink.workload.BaseWorkload;
 import org.example.flink.workload.market_analysis.beans.AdClickEvent;

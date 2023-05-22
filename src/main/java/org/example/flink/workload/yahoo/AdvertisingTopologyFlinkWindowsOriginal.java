@@ -22,6 +22,7 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.apache.flink.util.Collector;
+import org.example.flink.common.MyDataStream;
 import org.example.flink.config.BaseConfig;
 import org.example.flink.workload.BaseWorkload;
 import org.example.flink.workload.yahoo.storage.RedisAdCampaignCache;
@@ -39,7 +40,7 @@ public class AdvertisingTopologyFlinkWindowsOriginal extends BaseWorkload {
     private static final Logger LOG = LoggerFactory.getLogger(AdvertisingTopologyFlinkWindowsOriginal.class);
 
     @Override
-    public void createWorkload(BaseConfig baseConfig, DataStream<String> source) throws Exception {
+    public void createWorkload(BaseConfig baseConfig, MyDataStream source) throws Exception {
 
         YahooConfig config = (YahooConfig) baseConfig;
         DataStream<Tuple2<String, String>> joinedAdImpressions = source

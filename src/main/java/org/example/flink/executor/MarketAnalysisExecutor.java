@@ -3,6 +3,7 @@ package org.example.flink.executor;
 import org.apache.flink.streaming.api.functions.source.RichParallelSourceFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
+import org.example.flink.common.MyDataStream;
 import org.example.flink.config.MarketAnalysisConfig;
 import org.example.flink.source.MarketAnalysisGenerator;
 import org.example.flink.workload.market_analysis.AdStatisticsByProvince;
@@ -35,6 +36,6 @@ public class MarketAnalysisExecutor extends BaseExecutor {
             sourceName = "Kafka";
         }
 
-        source = env.addSource(sourceGenerator, sourceName).disableChaining();
+        source = new MyDataStream(env.addSource(sourceGenerator, sourceName).disableChaining());
     }
 }

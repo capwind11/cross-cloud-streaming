@@ -17,6 +17,7 @@ import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
+import org.example.flink.common.MyDataStream;
 import org.example.flink.config.BaseConfig;
 import org.example.flink.workload.BaseWorkload;
 import org.example.flink.workload.hotitems.beans.ItemViewCount;
@@ -33,7 +34,7 @@ import java.util.Comparator;
  */
 public class HotItems extends BaseWorkload{
     @Override
-    public void createWorkload(BaseConfig config, DataStream<String> source) throws Exception {
+    public void createWorkload(BaseConfig config, MyDataStream source) throws Exception {
         DataStream<Tuple5<Long, Long, Integer, String, Long>> dataStream = source
                 .map(
                         new MapFunction<String, Tuple5<Long, Long, Integer, String, Long>>() {
