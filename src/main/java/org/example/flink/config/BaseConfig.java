@@ -45,6 +45,11 @@ public class BaseConfig implements Serializable {
 
     // execution setting
     public String env;
+    public boolean upstream;
+
+    public boolean downstream;
+
+    public int breakPoint;
 
 
     /**
@@ -86,6 +91,8 @@ public class BaseConfig implements Serializable {
 
         // Env
         this.env = parameterTool.get("env", "local");
+        this.upstream = parameterTool.has("upstream");
+        this.downstream = parameterTool.has("downstream");
     }
 
     public static ParameterTool yamlToParameters(String yamlFile) throws FileNotFoundException {

@@ -3,12 +3,10 @@ package org.example.flink.workload.hotitems;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.AggregateFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.state.ListState;
 import org.apache.flink.api.common.state.ListStateDescriptor;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
@@ -23,7 +21,9 @@ import org.example.flink.workload.hotitems.beans.ItemViewCount;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * @ClassName: HotItems
@@ -33,27 +33,24 @@ import java.util.Comparator;
  */
 public class HotItems implements BaseWorkload{
     @Override
-    public void createJob(BaseConfig config, DataStream<String> source) throws Exception {
-        DataStream<Tuple5<Long, Long, Integer, String, Long>> dataStream = source
-                .map(
-                        new MapFunction<String, Tuple5<Long, Long, Integer, String, Long>>() {
-                            @Override
-                            public Tuple5<Long, Long, Integer, String, Long> map(String line) throws Exception {
-                                String[] fields = line.split(",");
+    public void createJob(BaseConfig config, DataStream<? extends Tuple> source) throws Exception {
 
-                                return new Tuple5<Long, Long, Integer, String, Long>(new Long(fields[0]), new Long(fields[1]), new Integer(fields[2]), fields[3], new Long(fields[4]));
-                            }
-                        }
-                );
-
+        List<String> tmp = Arrays.asList("", "");
+        String s = tmp.get(0);
+        if (config.upstream) {
+            switch (config.breakPoint) {
+                case 0:
+                    source = source.filter(data -> "pv".equals(data.getField(3))).name("filter");
+                case 1:
+                    source = source.project(0,4);
+            }
+        }
         // 4. 分组开窗聚合，得到每个窗口内各个商品的count值
-        DataStream<Tuple2<Long, Long>> filterStream = dataStream
-                .filter(data -> "pv".equals(data.getField(3)))
-                .<Tuple2<Long, Long>>project(0, 4)
-                .assignTimestampsAndWatermarks(new AscendingTimestampExtractor<Tuple2<Long, Long>>() {
+        DataStream<Tuple2<Long, Long>> filterStream = source.assignTimestampsAndWatermarks(
+                new AscendingTimestampExtractor<? extends Tuple>() {
 
                     @Override
-                    public long extractAscendingTimestamp(Tuple2<Long, Long> element) {
+                    public long extractAscendingTimestamp(Tuple element) {
                         return (long) element.getField(1) * 1000L;
                     }
                 });

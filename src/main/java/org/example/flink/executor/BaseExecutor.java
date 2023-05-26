@@ -1,5 +1,6 @@
 package org.example.flink.executor;
 
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.configuration.ConfigConstants;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.RestOptions;
@@ -11,6 +12,8 @@ import org.example.flink.workload.BaseWorkload;
 import java.io.FileNotFoundException;
 
 public abstract class BaseExecutor {
+
+    public DataStream<? extends Tuple> map;
 
     public BaseWorkload workload;
 
@@ -45,7 +48,11 @@ public abstract class BaseExecutor {
         prepareSource();
 
         workload.createJob(config, source);
-        env.execute();
+        StreamExecutionEnvironment newEnv = StreamExecutionEnvironment.getExecutionEnvironment(configuration);
+        newEnv.addOperator(env.getTransformations().get(0));
+        newEnv.addOperator(env.getTransformations().get(1));
+        env.close();
+        newEnv.execute();
     }
 
     abstract void init(String[] args) throws FileNotFoundException;
