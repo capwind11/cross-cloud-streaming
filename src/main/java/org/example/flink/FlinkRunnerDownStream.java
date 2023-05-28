@@ -7,7 +7,7 @@ public class FlinkRunnerDownStream {
 
     public static void main(String args[]) throws Exception {
 
-        BaseExecutor executor = new HotitemsExecutor(3, "upstream");
+        BaseExecutor executor = new HotitemsExecutor(3, "downstream");
         executor.runJob(new String[]{});
     }
 }

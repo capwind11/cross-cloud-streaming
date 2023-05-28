@@ -22,7 +22,6 @@ import org.example.flink.workload.hotitems.beans.ItemViewCount;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 
 /**
@@ -31,13 +30,14 @@ import java.util.Comparator;
  * @Author: 土哥 on 2020/11/14 15:16
  * @Version: 1.0
  */
-public class HotItems implements BaseWorkload{
+public class HotItems implements BaseWorkload {
     @Override
     public DataStream<?> createJob(DataStream<?> source, String segment, int breakPoint) throws Exception {
 
         if ("upstream".equals(segment)) {
             if (breakPoint<1) return source;
-             source = ((DataStream<String>) source).map(
+
+            source = ((DataStream<String>)source).map(
                     new MapFunction<String, Tuple5<Long, Long, Integer, String, Long>>() {
                         @Override
                         public Tuple5<Long, Long, Integer, String, Long> map(String line) throws Exception {
@@ -47,52 +47,27 @@ public class HotItems implements BaseWorkload{
                         }
                     }
             );
-            if (breakPoint<2) return source.map(
-                    new MapFunction<Tuple5<Long, Long, Integer, String, Long>, String>() {
-                        @Override
-                        public String map(Tuple5<Long, Long, Integer, String, Long> line) throws Exception {
+            if (breakPoint<1) return source;
 
-                            return String.join(",", Arrays.asList(line.getField(0), line.getField(1), line.getField(2), line.getField(3), ;line.getField(4)));
-                        }
-                    });
-            source = ((DataStream<Tuple>)source).filter(data -> "pv".equals(data.getField(3))).name("filter");
-            if (breakPoint<3) return source.map(
-                    new MapFunction<Tuple5<Long, Long, Integer, String, Long>, String>() {
-                        @Override
-                        public String map(Tuple5<Long, Long, Integer, String, Long> line) throws Exception {
+            source = ((DataStream<Tuple>)source).filter(data -> "pv".equals(data.getField(3)));
+            if (breakPoint<2) return source;
 
-                            return String.join(",", Arrays.asList(line.getField(0), line.getField(1), line.getField(2), line.getField(3), ;line.getField(4)));
-                        }
-                    });
-            source = source.project(0,4);
-            return ((DataStream<Tuple2<Long, Long>>)source).map(
-                    new MapFunction<Tuple2<Long, Long>, String>() {
-                        @Override
-                        public String map(Tuple2<Long, Long> line) throws Exception {
-
-                            return String.join(",", Arrays.asList(line.getField(0), line.getField(1)));
-                        }
-                    });
+            return source.project(0, 4);
         }
 
         if ("downstream".equals(segment)) {
-            if (breakPoint<1) {
-                source = ((DataStream<String>) source).map(
-                        new MapFunction<String, Tuple5<Long, Long, Integer, String, Long>>() {
-                            @Override
-                            public Tuple5<Long, Long, Integer, String, Long> map(String line) throws Exception {
+            switch (breakPoint) {
+                case 0:
+                    source = ((DataStream<String>)source).map(
+                            (MapFunction<String, Tuple5<Long, Long, Integer, String, Long>>) line -> {
                                 String[] fields = line.split(",");
-
                                 return new Tuple5<Long, Long, Integer, String, Long>(new Long(fields[0]), new Long(fields[1]), new Integer(fields[2]), fields[3], new Long(fields[4]));
                             }
-                        }
-                );
-            }
-            if (breakPoint<2) {
-                source = ((DataStream<Tuple>)source).filter(data -> "pv".equals(data.getField(3))).name("filter");
-            }
-            if (breakPoint<3) {
-                source = source.project(0,4);
+                    );
+                case 1:
+                    source = ((DataStream<Tuple>)source).filter(data -> "pv".equals(data.getField(3)));
+                case 2:
+                    source = source.project(0, 4);
             }
         }
 
@@ -108,8 +83,7 @@ public class HotItems implements BaseWorkload{
 
         DataStream<ItemViewCount> windowAggStream = filterStream.keyBy(0)    // 按商品ID分组
                 .timeWindow(Time.hours(1), Time.minutes(5))    // 开滑窗
-                .aggregate(new ItemCountAgg(),
-                        new WindowItemCountResult());
+                .aggregate(new ItemCountAgg(), new WindowItemCountResult());
 
         // 5. 收集同一窗口的所有商品count数据，排序输出top n
         DataStream<String> resultStream = windowAggStream

@@ -42,9 +42,16 @@ public abstract class BaseExecutor {
 
         Configuration configuration = new Configuration();
 
+        // TODO 本地是否可以共用一个端口
         // 本地执行设置端口
         if ("local".equals(config.env)) {
-            configuration.setInteger(RestOptions.PORT, 8082);
+            int port = 8082;
+            if ("upstream".equals(segment)) {
+                port = 8083;
+            }  else if ("downstream".equals(segment)) {
+                port = 8084;
+            }
+            configuration.setInteger(RestOptions.PORT, port);
             configuration.setBoolean(ConfigConstants.LOCAL_START_WEBSERVER, true);
         }
 
@@ -52,9 +59,9 @@ public abstract class BaseExecutor {
         env = StreamExecutionEnvironment.getExecutionEnvironment(configuration);
         env.getConfig().setGlobalJobParameters(config.getParameters());
 
-        if (config.checkpointsEnabled) {
-            env.enableCheckpointing(config.checkpointInterval);
-        }
+//        if (config.checkpointsEnabled) {
+//            env.enableCheckpointing(config.checkpointInterval);
+//        }
 
         // Implemented By Child
         prepareSource();
@@ -65,7 +72,7 @@ public abstract class BaseExecutor {
             job = source;
         }
         addSink();
-
+        env.disableOperatorChaining();
         env.execute();
     }
 
@@ -74,5 +81,5 @@ public abstract class BaseExecutor {
     abstract void init(String[] args) throws FileNotFoundException;
 
     abstract void prepareSource() throws Exception;
-    
+
 }
