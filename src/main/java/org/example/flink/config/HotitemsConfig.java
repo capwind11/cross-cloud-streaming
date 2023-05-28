@@ -27,7 +27,7 @@ public class HotitemsConfig extends BaseConfig {
      */
     public static HotitemsConfig fromArgs(String[] args) throws FileNotFoundException {
         if (args.length < 1) {
-            return new HotitemsConfig("conf/market_analysis.yaml");
+            return new HotitemsConfig("conf/hotitems.yaml");
         } else {
             return new HotitemsConfig(args[0]);
         }

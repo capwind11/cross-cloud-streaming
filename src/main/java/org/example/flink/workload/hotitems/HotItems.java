@@ -3,10 +3,12 @@ package org.example.flink.workload.hotitems;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.AggregateFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.state.ListState;
 import org.apache.flink.api.common.state.ListStateDescriptor;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
@@ -15,7 +17,6 @@ import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
-import org.example.flink.config.BaseConfig;
 import org.example.flink.workload.BaseWorkload;
 import org.example.flink.workload.hotitems.beans.ItemViewCount;
 
@@ -23,7 +24,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 
 /**
  * @ClassName: HotItems
@@ -33,24 +33,75 @@ import java.util.List;
  */
 public class HotItems implements BaseWorkload{
     @Override
-    public void createJob(BaseConfig config, DataStream<? extends Tuple> source) throws Exception {
+    public DataStream<?> createJob(DataStream<?> source, String segment, int breakPoint) throws Exception {
 
-        List<String> tmp = Arrays.asList("", "");
-        String s = tmp.get(0);
-        if (config.upstream) {
-            switch (config.breakPoint) {
-                case 0:
-                    source = source.filter(data -> "pv".equals(data.getField(3))).name("filter");
-                case 1:
-                    source = source.project(0,4);
+        if ("upstream".equals(segment)) {
+            if (breakPoint<1) return source;
+             source = ((DataStream<String>) source).map(
+                    new MapFunction<String, Tuple5<Long, Long, Integer, String, Long>>() {
+                        @Override
+                        public Tuple5<Long, Long, Integer, String, Long> map(String line) throws Exception {
+                            String[] fields = line.split(",");
+
+                            return new Tuple5<Long, Long, Integer, String, Long>(new Long(fields[0]), new Long(fields[1]), new Integer(fields[2]), fields[3], new Long(fields[4]));
+                        }
+                    }
+            );
+            if (breakPoint<2) return source.map(
+                    new MapFunction<Tuple5<Long, Long, Integer, String, Long>, String>() {
+                        @Override
+                        public String map(Tuple5<Long, Long, Integer, String, Long> line) throws Exception {
+
+                            return String.join(",", Arrays.asList(line.getField(0), line.getField(1), line.getField(2), line.getField(3), ;line.getField(4)));
+                        }
+                    });
+            source = ((DataStream<Tuple>)source).filter(data -> "pv".equals(data.getField(3))).name("filter");
+            if (breakPoint<3) return source.map(
+                    new MapFunction<Tuple5<Long, Long, Integer, String, Long>, String>() {
+                        @Override
+                        public String map(Tuple5<Long, Long, Integer, String, Long> line) throws Exception {
+
+                            return String.join(",", Arrays.asList(line.getField(0), line.getField(1), line.getField(2), line.getField(3), ;line.getField(4)));
+                        }
+                    });
+            source = source.project(0,4);
+            return ((DataStream<Tuple2<Long, Long>>)source).map(
+                    new MapFunction<Tuple2<Long, Long>, String>() {
+                        @Override
+                        public String map(Tuple2<Long, Long> line) throws Exception {
+
+                            return String.join(",", Arrays.asList(line.getField(0), line.getField(1)));
+                        }
+                    });
+        }
+
+        if ("downstream".equals(segment)) {
+            if (breakPoint<1) {
+                source = ((DataStream<String>) source).map(
+                        new MapFunction<String, Tuple5<Long, Long, Integer, String, Long>>() {
+                            @Override
+                            public Tuple5<Long, Long, Integer, String, Long> map(String line) throws Exception {
+                                String[] fields = line.split(",");
+
+                                return new Tuple5<Long, Long, Integer, String, Long>(new Long(fields[0]), new Long(fields[1]), new Integer(fields[2]), fields[3], new Long(fields[4]));
+                            }
+                        }
+                );
+            }
+            if (breakPoint<2) {
+                source = ((DataStream<Tuple>)source).filter(data -> "pv".equals(data.getField(3))).name("filter");
+            }
+            if (breakPoint<3) {
+                source = source.project(0,4);
             }
         }
+
         // 4. 分组开窗聚合，得到每个窗口内各个商品的count值
-        DataStream<Tuple2<Long, Long>> filterStream = source.assignTimestampsAndWatermarks(
-                new AscendingTimestampExtractor<? extends Tuple>() {
+        DataStream<Tuple2<Long, Long>> filterStream = ((DataStream<Tuple2<Long, Long>>) source).assignTimestampsAndWatermarks(
+                new AscendingTimestampExtractor<Tuple2<Long, Long>>() {
 
                     @Override
-                    public long extractAscendingTimestamp(Tuple element) {
+                    public long extractAscendingTimestamp(Tuple2<Long, Long> element) {
                         return (long) element.getField(1) * 1000L;
                     }
                 });
@@ -65,8 +116,7 @@ public class HotItems implements BaseWorkload{
                 .keyBy("windowEnd")    // 按照窗口分组
                 .process(new TopNHotItems(5));   // 用自定义处理函数排序取前5
 
-        resultStream.print();
-//        windowAggStream.print();
+        return resultStream;
     }
 
     // 实现自定义增量聚合函数

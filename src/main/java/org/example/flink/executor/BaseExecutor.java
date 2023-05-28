@@ -1,6 +1,6 @@
 package org.example.flink.executor;
 
-import org.apache.flink.api.java.tuple.Tuple;
+import lombok.NoArgsConstructor;
 import org.apache.flink.configuration.ConfigConstants;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.RestOptions;
@@ -11,17 +11,29 @@ import org.example.flink.workload.BaseWorkload;
 
 import java.io.FileNotFoundException;
 
+@NoArgsConstructor
 public abstract class BaseExecutor {
 
-    public DataStream<? extends Tuple> map;
+
+    // execution setting
+    public int breakPoint;
+
+    public String segment;
+
+    public DataStream<?> source;
 
     public BaseWorkload workload;
 
     public StreamExecutionEnvironment env;
 
-    public DataStream<String> source;
-
     public BaseConfig config;
+
+    public DataStream<?> job;
+
+    public BaseExecutor(int breakPoint, String segment) {
+        this.breakPoint = breakPoint;
+        this.segment = segment;
+    }
 
     public void runJob(String[] args) throws Exception {
 
@@ -47,15 +59,20 @@ public abstract class BaseExecutor {
         // Implemented By Child
         prepareSource();
 
-        workload.createJob(config, source);
-        StreamExecutionEnvironment newEnv = StreamExecutionEnvironment.getExecutionEnvironment(configuration);
-        newEnv.addOperator(env.getTransformations().get(0));
-        newEnv.addOperator(env.getTransformations().get(1));
-        env.close();
-        newEnv.execute();
+        if (!"source".equals(segment)) {
+            job = workload.createJob(source, segment, breakPoint);
+        } else {
+            job = source;
+        }
+        addSink();
+
+        env.execute();
     }
+
+    abstract void addSink();
 
     abstract void init(String[] args) throws FileNotFoundException;
 
     abstract void prepareSource() throws Exception;
+    
 }

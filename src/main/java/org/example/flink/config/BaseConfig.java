@@ -23,7 +23,6 @@ public class BaseConfig implements Serializable {
     // Load Generator
     public int loadTargetHz;
     public int timeSliceLengthMs;
-    public boolean useLocalEventGenerator;
 
     // Redis
     public String redisHost;
@@ -45,12 +44,8 @@ public class BaseConfig implements Serializable {
 
     // execution setting
     public String env;
-    public boolean upstream;
 
-    public boolean downstream;
-
-    public int breakPoint;
-
+    public int port;
 
     /**
      * Get the parameters
@@ -65,7 +60,6 @@ public class BaseConfig implements Serializable {
         // load generator
         this.loadTargetHz = parameterTool.getInt("load.target.hz", 400_000);
         this.timeSliceLengthMs = parameterTool.getInt("load.time.slice.length.ms", 100);
-        this.useLocalEventGenerator = parameters.has("use.local.event.generator");
 
         // Kafka
         this.kafkaTopic = parameterTool.getRequired("kafka.topic");
@@ -90,9 +84,8 @@ public class BaseConfig implements Serializable {
         this.checkpointToUri = checkpointUri.length() > 0;
 
         // Env
-        this.env = parameterTool.get("env", "local");
-        this.upstream = parameterTool.has("upstream");
-        this.downstream = parameterTool.has("downstream");
+        this.env = parameterTool.get("flink.env", "local");
+        this.port = parameterTool.getInt("flink.port", 8081);
     }
 
     public static ParameterTool yamlToParameters(String yamlFile) throws FileNotFoundException {
