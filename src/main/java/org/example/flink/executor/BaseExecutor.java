@@ -67,7 +67,7 @@ public abstract class BaseExecutor {
         prepareSource();
 
         if (!"source".equals(segment)) {
-            job = workload.createJob(source, segment, breakPoint);
+            job = workload.createJob(source, config, segment, breakPoint);
         } else {
             job = source;
         }

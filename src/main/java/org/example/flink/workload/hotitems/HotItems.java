@@ -17,6 +17,7 @@ import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
+import org.example.flink.config.BaseConfig;
 import org.example.flink.workload.BaseWorkload;
 import org.example.flink.workload.hotitems.beans.ItemViewCount;
 
@@ -31,8 +32,9 @@ import java.util.Comparator;
  * @Version: 1.0
  */
 public class HotItems implements BaseWorkload {
+
     @Override
-    public DataStream<?> createJob(DataStream<?> source, String segment, int breakPoint) throws Exception {
+    public DataStream<?> createJob(DataStream<?> source, BaseConfig baseConfig, String segment, int breakPoint) throws Exception {
 
         if ("upstream".equals(segment)) {
             if (breakPoint<1) return source;

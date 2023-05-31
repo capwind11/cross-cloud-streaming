@@ -45,8 +45,6 @@ public class BaseConfig implements Serializable {
     // execution setting
     public String env;
 
-    public int port;
-
     /**
      * Get the parameters
      */
@@ -85,7 +83,6 @@ public class BaseConfig implements Serializable {
 
         // Env
         this.env = parameterTool.get("flink.env", "local");
-        this.port = parameterTool.getInt("flink.port", 8081);
     }
 
     public static ParameterTool yamlToParameters(String yamlFile) throws FileNotFoundException {

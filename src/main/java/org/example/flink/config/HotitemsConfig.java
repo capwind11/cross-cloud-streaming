@@ -10,6 +10,7 @@ public class HotitemsConfig extends BaseConfig {
     public int numUsers;
 
     public int numCategories;
+
     public int numItems;
 
     /**
