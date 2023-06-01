@@ -1,4 +1,4 @@
-package org.example.flink.workload.yahoo;
+package org.example.flink.workload.yahoo.storage;
 
 import org.example.flink.config.YahooConfig;
 import org.slf4j.Logger;
@@ -23,7 +23,7 @@ public class RedisHelper {
   }
 
   public void prepareRedis(Map<String, List<String>> campaigns) {
-    Jedis redis = new Jedis(config.redisHost);
+    Jedis redis = new Jedis(config.localRedisHost);
     redis.select(config.redisDb);
     if (config.redisFlush) {
       LOG.info("Flushing Redis DB.");

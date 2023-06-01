@@ -2,7 +2,7 @@
 # Licensed under the terms of the Apache License 2.0. Please see LICENSE file in the project root for terms.
 
 kafka.brokers:
-  - "127.0.0.1"
+  - "host.docker.internal"
 kafka.port: 9092
 kafka.topic: "yahoo-source"
 kafka.partitions: 2
@@ -11,10 +11,12 @@ kafka.zookeeper.path: /
 akka.zookeeper.path: /akkaQuery
 
 zookeeper.servers:
-  - "127.0.0.1"
+  - "host.docker.internal"
 zookeeper.port: 2181
 
-redis.host: "127.0.0.1"
+
+local.redis.host: "localhost"
+redis.host: "host.docker.internal"
 
 process.hosts: 10
 process.cores: 12
@@ -26,30 +28,7 @@ add.result.sink: 1
 flink.highcard.checkpointURI: "file:///tmp/checkpoints"
 redis.threads: 20
 
-env: local
-
-mode: normal
-debug: true
-local_operators:
-  - 'Flat Map-0'
-  - 'Flat Map'
-  - 'Source: Kafka'
-  - 'Filter'
-
-border:
-  - 'Filter'
-
-remote_operators:
-  - 'Map'
-  - 'Projection'
-  - 'Sink: Unnamed'
-  - 'Flat Map-1'
-  - 'Window(TumblingEventTimeWindows(10000), EventAndProcessingTimeTrigger, ReduceFunction$1, WindowFunction$2)'
-  - 'Timestamps/Watermarks'
-
-local_parallelism: 3
-remote_parallelism: 2
-num_of_slots: 20
+flink.env: remote
 parallelism: 1
 
 

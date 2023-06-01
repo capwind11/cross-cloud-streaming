@@ -1,0 +1,34 @@
+version: "3"
+services:
+    jobmanager:
+      image: flink:1.16
+      expose:
+        - "6124"
+      ports:
+        - "6124:6123"
+        - "8082:8081"
+      command: jobmanager
+      environment:
+        - JOB_MANAGER_RPC_ADDRESS=jobmanager
+
+    taskmanager:
+      image: flink:1.16
+      expose:
+        - "6121"
+        - "6122"
+      depends_on:
+        - jobmanager
+      command: taskmanager
+      links:
+        - "jobmanager:jobmanager"
+      deploy:
+        resources:
+          limits:
+            cpus: "1"
+      environment:
+        - |
+          FLINK_PROPERTIES=
+          jobmanager.rpc.address: jobmanager
+          parallelism.default: 2
+          taskmanager.memory.managed.size: 0
+          taskmanager.memory.task.heap.size: 512m

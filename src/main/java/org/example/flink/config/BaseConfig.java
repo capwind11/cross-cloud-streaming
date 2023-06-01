@@ -26,6 +26,9 @@ public class BaseConfig implements Serializable {
 
     // Redis
     public String redisHost;
+
+    public String localRedisHost;
+
     public int redisDb;
     public boolean redisFlush;
     public int numRedisThreads;
@@ -63,6 +66,7 @@ public class BaseConfig implements Serializable {
         this.kafkaTopic = parameterTool.getRequired("kafka.topic");
 
         // Redis
+        this.localRedisHost = parameterTool.get("local.redis.host", "localhost");
         this.redisHost = parameterTool.get("redis.host", "localhost");
         this.redisDb = parameterTool.getInt("redis.db", 0);
         this.redisFlush = parameterTool.has("redis.flush");

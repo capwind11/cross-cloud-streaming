@@ -15,17 +15,19 @@ import org.apache.flink.streaming.api.functions.source.RichParallelSourceFunctio
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
+import org.example.flink.common.FlinkRebalancePartitioner;
 import org.example.flink.config.BaseConfig;
 import org.example.flink.config.YahooConfig;
 import org.example.flink.source.YahooGenerator;
 import org.example.flink.workload.yahoo.AdvertisingTopologyFlinkWindows;
-import org.example.flink.workload.yahoo.RedisHelper;
+import org.example.flink.workload.yahoo.storage.RedisHelper;
 import redis.clients.jedis.Jedis;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @NoArgsConstructor
 public class YahooExecutor extends BaseExecutor {
@@ -47,6 +49,7 @@ public class YahooExecutor extends BaseExecutor {
 
         // 初始化配置及环境
         config = YahooConfig.fromArgs(args);
+        System.out.println(config);
         // 初始化负载
         workload = new AdvertisingTopologyFlinkWindows();
     }
@@ -94,7 +97,8 @@ public class YahooExecutor extends BaseExecutor {
             ((DataStream<Tuple>) job).addSink(new FlinkKafkaProducer<>(
                     kafkaTopic,
                     new TypeInformationSerializationSchema<>((TypeInformation<Tuple>) TypeInformation.of(typeHintMap.get(breakPoint)), env.getConfig()),
-                    config.getParameters().getProperties()
+                    config.getParameters().getProperties(),
+                    Optional.of(new FlinkRebalancePartitioner<>())
             )).name(kafkaTopic);
         } else {
             ((DataStream<Tuple4<String, String, String, Long>>)job).addSink(new RedisResultSinkOptimized(config));;

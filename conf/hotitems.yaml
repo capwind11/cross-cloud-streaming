@@ -3,7 +3,7 @@
 
 # Source Sink
 kafka.brokers:
-  - "127.0.0.1"
+  - "host.docker.internal"
 kafka.port: 9092
 kafka.topic: "kafka-hotitems"
 kafka.partitions: 2
@@ -12,10 +12,10 @@ kafka.zookeeper.path: /
 akka.zookeeper.path: /akkaQuery
 
 zookeeper.servers:
-  - "127.0.0.1"
+  - "host.docker.internal"
 zookeeper.port: 2181
 
-redis.host: "127.0.0.1"
+redis.host: "host.docker.internal"
 
 process.hosts: 10
 process.cores: 12
@@ -38,7 +38,7 @@ load.target.hz: 10000
 # partition
 breakPoint: 3
 
-flink.local: local
+flink.local: remote
 flink.port: 8081
 
 flink.stream.segment: upstream

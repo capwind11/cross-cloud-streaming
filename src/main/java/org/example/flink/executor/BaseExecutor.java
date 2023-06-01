@@ -1,9 +1,7 @@
 package org.example.flink.executor;
 
 import lombok.NoArgsConstructor;
-import org.apache.flink.configuration.ConfigConstants;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.example.flink.config.BaseConfig;
@@ -44,16 +42,16 @@ public abstract class BaseExecutor {
 
         // TODO 本地是否可以共用一个端口
         // 本地执行设置端口
-        if ("local".equals(config.env)) {
-            int port = 8082;
-            if ("upstream".equals(segment)) {
-                port = 8083;
-            }  else if ("downstream".equals(segment)) {
-                port = 8084;
-            }
-            configuration.setInteger(RestOptions.PORT, port);
-            configuration.setBoolean(ConfigConstants.LOCAL_START_WEBSERVER, true);
-        }
+//        if ("local".equals(config.env)) {
+//            int port = 8082;
+//            if ("upstream".equals(segment)) {
+//                port = 8083;
+//            }  else if ("downstream".equals(segment)) {
+//                port = 8084;
+//            }
+//            configuration.setInteger(RestOptions.PORT, port);
+//            configuration.setBoolean(ConfigConstants.LOCAL_START_WEBSERVER, true);
+//        }
 
         // 初始化环境
         env = StreamExecutionEnvironment.getExecutionEnvironment(configuration);

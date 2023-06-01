@@ -22,6 +22,7 @@ import org.apache.flink.util.Collector;
 import org.example.flink.config.BaseConfig;
 import org.example.flink.config.YahooConfig;
 import org.example.flink.workload.BaseWorkload;
+import org.example.flink.workload.yahoo.storage.RedisAdCampaignCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -213,7 +214,7 @@ public class AdvertisingTopologyFlinkWindows implements BaseWorkload {
      */
     private static final class RedisJoinBolt extends RichFlatMapFunction<Tuple2<String, String>, Tuple2<String, String>> {
 
-        private org.example.flink.workload.yahoo.RedisAdCampaignCache redisAdCampaignCache;
+        private RedisAdCampaignCache redisAdCampaignCache;
         private YahooConfig config;
 
         public RedisJoinBolt(YahooConfig config) {
@@ -225,7 +226,7 @@ public class AdvertisingTopologyFlinkWindows implements BaseWorkload {
             //initialize jedis
             String redis_host = config.redisHost;
             LOG.info("Opening connection with Jedis to {}", redis_host);
-            this.redisAdCampaignCache = new org.example.flink.workload.yahoo.RedisAdCampaignCache(redis_host);
+            this.redisAdCampaignCache = new RedisAdCampaignCache(redis_host);
             this.redisAdCampaignCache.prepare();
         }
 
