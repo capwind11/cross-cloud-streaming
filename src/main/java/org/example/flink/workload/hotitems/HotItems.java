@@ -6,6 +6,7 @@ import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.state.ListState;
 import org.apache.flink.api.common.state.ListStateDescriptor;
+import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple5;
@@ -51,7 +52,7 @@ public class HotItems implements BaseWorkload {
             );
             if (breakPoint<1) return source;
 
-            source = ((DataStream<Tuple>)source).filter(data -> "pv".equals(data.getField(3)));
+            source = ((DataStream<Tuple>)source).filter(data -> "pv".equals(data.getField(3))).returns(Types.TUPLE(Types.LONG, Types.LONG, Types.INT, Types.STRING, Types.LONG));
             if (breakPoint<2) return source;
 
             return source.project(0, 4);

@@ -18,8 +18,8 @@ public class HotitemsConfig extends BaseConfig {
      */
     public HotitemsConfig(String yamlFile) throws FileNotFoundException {
         super(yamlToParameters(yamlFile));
-        this.numUsers = parameters.getInt("num.users", 10000);
-        this.numItems = parameters.getInt("num.items", 1000000);
+        this.numUsers = parameters.getInt("num.users", 100000);
+        this.numItems = parameters.getInt("num.items", 1000);
         this.numCategories = parameters.getInt("num.categories", 100);
     }
 

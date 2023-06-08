@@ -5,6 +5,7 @@ import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.api.common.state.MapStateDescriptor;
+import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple5;
@@ -22,7 +23,6 @@ import org.example.flink.workload.BaseWorkload;
 import org.example.flink.workload.network.beans.PageViewCount;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Map;
@@ -48,7 +48,7 @@ public class HotPages implements BaseWorkload {
             );
             if (breakPoint < 2) return source;
 
-            source = ((DataStream<Tuple>) source).filter(data -> "GET".equals(data.getField(3)));    // 过滤get请求
+            source = ((DataStream<Tuple>) source).filter(data -> "GET".equals(data.getField(3))).returns(Types.TUPLE(Types.STRING, Types.STRING, Types.LONG, Types.STRING, Types.STRING));    // 过滤get请求
             if (breakPoint < 3) return source;
 
             // 只保留 timestamp和url
@@ -64,12 +64,16 @@ public class HotPages implements BaseWorkload {
         if ("downstream".equals(segment)) {
             switch (breakPoint) {
                 case 0:
-                    source = ((DataStream<String>) source).map(line -> {
-                        String[] fields = line.split(" ");
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy:HH:mm:ss");
-                        Long timestamp = simpleDateFormat.parse(fields[3]).getTime();
-                        return new Tuple5(fields[0], fields[1], timestamp, fields[5], fields[6]);
-                    });
+                    source = ((DataStream<String>) source).map(
+                            new MapFunction<String, Tuple5<String, String, Long, String, String>>() {
+                                @Override
+                                public Tuple5<String, String, Long, String, String> map(String line) throws Exception {
+                                    String[] fields = line.split(" ");
+
+                                    return new Tuple5(fields[0], fields[1], new Long(fields[2]), fields[3], fields[4]);
+                                }
+                            }
+                    );
                 case 1:
                     source = ((DataStream<Tuple>) source).filter(data -> "GET".equals(data.getField(3)));    // 过滤get请求
                 case 2:

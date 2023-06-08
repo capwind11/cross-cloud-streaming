@@ -4,6 +4,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import org.apache.flink.api.common.functions.*;
+import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.*;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -43,10 +44,10 @@ public class AdvertisingTopologyFlinkWindows implements BaseWorkload {
         if ("upstream".equals(segment)) {
             if (breakPoint<1) return source;
 
-            source = ((DataStream<String>)source).flatMap(new DeserializeBolt());
+            source = ((DataStream<String>)source).flatMap(new DeserializeBolt()).returns(Types.TUPLE(Types.STRING, Types.STRING, Types.STRING, Types.STRING, Types.STRING, Types.STRING));
             if (breakPoint<2) return source;
 
-            source = ((DataStream<Tuple>)source).filter(data -> "view".equals(data.getField(4)));
+            source = ((DataStream<Tuple>)source).filter(data -> "view".equals(data.getField(4))).returns(Types.TUPLE(Types.STRING, Types.STRING, Types.STRING, Types.STRING, Types.STRING, Types.STRING));
             if (breakPoint<3) return source;
 
             return source.project(2, 5);

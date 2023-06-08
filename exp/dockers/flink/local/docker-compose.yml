@@ -29,6 +29,15 @@ services:
         - |
           FLINK_PROPERTIES=
           jobmanager.rpc.address: jobmanager
+          
+          metrics.reporter.promgateway.factory.class: org.apache.flink.metrics.prometheus.PrometheusPushGatewayReporterFactory
+          metrics.reporter.promgateway.hostUrl: http://host.docker.internal:9091
+          metrics.reporter.promgateway.jobName: myJob
+          metrics.reporter.promgateway.randomJobNameSuffix: true
+          metrics.reporter.promgateway.deleteOnShutdown: false
+          metrics.reporter.promgateway.groupingKey: k1=v1;k2=v2
+          metrics.reporter.promgateway.interval: 60 SECONDS
+          
           parallelism.default: 2
           taskmanager.memory.managed.size: 0
           taskmanager.memory.task.heap.size: 512m

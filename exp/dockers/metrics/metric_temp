@@ -1,0 +1,9 @@
+# HELP probe_dns_lookup_time_seconds Returns the time taken for probe dns lookup in seconds
+# TYPE probe_dns_lookup_time_seconds gauge
+probe_dns_lookup_time_seconds 0.009884
+# HELP probe_http_status_code Response HTTP status code
+# TYPE probe_http_status_code gauge
+probe_http_status_code 200
+# HELP probe_duration_seconds Returns how long the probe took to complete in seconds
+# TYPE probe_duration_seconds gauge
+probe_duration_seconds 0.108699
